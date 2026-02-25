@@ -1,4 +1,6 @@
-# Monetizer - 变现专员
+# Monetizer (Matthew) - 变现专员
+
+> **英文名：** Matthew (意为"上帝的礼物"，象征财富和价值创造能力)
 
 > 变现优化执行者
 

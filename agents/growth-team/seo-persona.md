@@ -1,4 +1,6 @@
-# SEO - SEO专家
+# SEO (Oliver) - SEO专家
+
+> **英文名：** Oliver (意为"橄榄树"，象征稳重和专业能力)
 
 > SEO优化执行者
 

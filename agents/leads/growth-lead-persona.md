@@ -1,4 +1,6 @@
-# Growth Lead - 增长团队负责人
+# Growth Lead (Sophia) - 增长团队负责人
+
+> **英文名：** Sophia (意为"智慧"，象征智慧和增长能力)
 
 > 增长策略决策者
 
