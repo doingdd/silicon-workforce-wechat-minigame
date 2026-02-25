@@ -42,6 +42,27 @@ check_openclaw() {
     print_success "OpenClaw 已安装"
 }
 
+# 检查 Persona 文件
+check_personas() {
+    print_info "检查 Persona 文件..."
+
+    local personas=(
+        "agents/leads/ceo-persona.md"
+        "agents/leads/game-lead-persona.md"
+        "agents/leads/growth-lead-persona.md"
+        "agents/leads/data-lead-persona.md"
+    )
+
+    for persona in "${personas[@]}"; do
+        if [ ! -f "$WORKSPACE_DIR/$persona" ]; then
+            print_error "Persona 文件不存在: $persona"
+            exit 1
+        fi
+    done
+
+    print_success "所有 Persona 文件存在"
+}
+
 # 启动 CEO
 start_ceo() {
     print_info "启动 CEO（项目总负责人）..."
@@ -74,38 +95,8 @@ start_game_lead() {
 start_growth_lead() {
     print_info "启动 Growth Lead（增长团队负责人）..."
 
-    GROWTH_LEAD_PERSONA="你是增长团队负责人（Growth Lead）。
-
-核心职责：
-1. 决定增长策略（什么类型的游戏优先推广）
-2. 决定渠道投入（小红书/X 平台的资源分配）
-3. 决定内容策略（今天发布什么内容）
-4. 决定优化方向（哪些内容需要优化/删除）
-
-决策依据：
-- 实时数据：粉丝增长、内容互动
-- ROI 分析：投入产出比
-- 用户反馈：评论和建议
-
-工作方式：
-- 数据驱动：根据数据做决策
-- 快速试错：小步快跑，快速迭代
-- 内容为王：提供有价值的内容
-- 主动汇报：每日向 CEO 汇报
-
-兜底机制：
-- 处理 Growth Team 上报的无法解决的问题
-- 同一问题循环 2-3 次仍然无法解决 → 上报给 CEO
-- 问题超时仍未解决 → 上报给 CEO
-
-汇报频率：
-- 每天至少两次：上午、下午
-- 紧急问题：立即上报
-
-回复 'READY' 表示就绪。"
-
     openclaw sessions_spawn \
-        --task "$GROWTH_LEAD_PERSONA" \
+        --task "$(cat "$WORKSPACE_DIR/agents/leads/growth-lead-persona.md")" \
         --label "growth-lead" \
         --mode session \
         --model "zai/glm-4.7" > /dev/null 2>&1 &
@@ -118,38 +109,8 @@ start_growth_lead() {
 start_data_lead() {
     print_info "启动 Data Lead（数据团队负责人）..."
 
-    DATA_LEAD_PERSONA="你是数据团队负责人（Data Lead）。
-
-核心职责：
-1. 决定数据分析方向（今天分析什么数据）
-2. 决定优化建议（哪些游戏/内容需要优化）
-3. 决定变现策略（如何调整变现方式）
-4. 向 CEO 提出量化建议
-
-决策依据：
-- 实时数据：所有游戏、所有渠道的数据
-- 趋势分析：识别数据趋势和异常
-- ROI 分析：投入产出比
-
-工作方式：
-- 数据驱动：所有决策基于数据
-- 实时监控：24/7 监控所有指标
-- 自动化：自动生成报告和优化建议
-- 主动预警：发现问题立即上报
-
-兜底机制：
-- 处理 Data Team 上报的无法解决的问题
-- 同一问题循环 2-3 次仍然无法解决 → 上报给 CEO
-- 问题超时仍未解决 → 上报给 CEO
-
-汇报频率：
-- 每天至少两次：上午、下午
-- 紧急问题：立即上报
-
-回复 'READY' 表示就绪。"
-
     openclaw sessions_spawn \
-        --task "$DATA_LEAD_PERSONA" \
+        --task "$(cat "$WORKSPACE_DIR/agents/leads/data-lead-persona.md")" \
         --label "data-lead" \
         --mode session \
         --model "zai/glm-4.7" > /dev/null 2>&1 &
@@ -176,15 +137,20 @@ show_team_status() {
     echo "  └──────────────────┴──────────────────┴──────────────────┘"
     echo ""
     echo "Agent 统计："
-    echo "  - CEO: 1"
-    echo "  - Leads: 3 (Game, Growth, Data)"
-    echo "  - Executors: 0 (待启动）"
-    echo "  - 总计: 4 个 Agents (当前）"
+    echo "  - CEO: 1 (mode: session, 一直运行）"
+    echo "  - Leads: 3 (mode: session, 一直运行）"
+    echo "  - Executors: 0 (mode: run, 按需启动）"
+    echo "  - 总计: 4 个 Sub-Agents (当前）"
+    echo ""
+    echo "并发限制："
+    echo "  - 最大并发 Sub-Agents: 8"
+    echo "  - 当前并发: 4 (✅ 符合限制）"
     echo ""
     echo "下一步操作："
     echo "  1. 查看 Agents: openclaw subagents list"
-    echo "  2. 分配任务: ./scripts/assign-task.sh"
-    echo "  3. 停止团队: ./scripts/stop-team.sh"
+    echo "  2. 发送任务: ./scripts/send-task.sh <label> <message>"
+    echo "  3. 汇报状态: ./scripts/report-status.sh <role> [type]"
+    echo "  4. 停止团队: ./scripts/stop-team.sh"
     echo ""
 }
 
@@ -197,6 +163,7 @@ main() {
     echo ""
 
     check_openclaw
+    check_personas
 
     print_info "启动第 1 层：CEO..."
     start_ceo
